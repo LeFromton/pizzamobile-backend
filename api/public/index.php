@@ -70,19 +70,20 @@ function removeOrder(array $order, string $path){
   
 }
 
-function writeOrder(array $order, string $path){
-  $currentFile = fopen($path, 'a');
-  fputcsv($currentFile, $order);
-  fclose($currentFile);
+function writeOrder(array $order, $table){
+  $db = mysqli_connect("localhost:4439", "SA", "EXPRESS12345678", "PizzamobileDB");
+  $query = "INSERT INTO ? (Name, Phone, Pizzas, Status) VALUES (?, ?, ?, ?);";
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, 'ssss', $table, $order['name'], $order['phone'], $order['pizzas'], $order['status']);
+  mysqli_stmt_execute($stmt);
+  mysqli_stmt_close($stmt);
+  mysqli_close($db);
 }
 
 function getCurrentOrders(): array {
-  $currentLogFile = fopen('../db/current-orders.csv', 'r');
-  $data = fgetcsv($currentLogFile, null, ';');
-  fclose($currentLogFile);
-  if(empty($data)){
-    return array('No data found');
-  } else {
-    return $data;
-  }
+  $db = mysqli_connect("localhost:4439", "SA", "EXPRESS12345678", "PizzamobileDB");
+  $stmt = mysqli_query($db, "SELECT * FROM Orders");
+  $result = mysqli_fetch_all($stmt, MYSQLI_ASSOC);
+  mysqli_close($db);
+  return $result;
 }

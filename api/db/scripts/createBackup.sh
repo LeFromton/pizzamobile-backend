@@ -35,10 +35,13 @@ then
   if [[ -n $pullImage ]]
   then
     echo -e "${GREEN} Image is being pulled ${NC}"
-    sudo docker pull mattrayner/lamp:latest-2004-php8
+    sudo docker pull mcr.microsoft.com/mssql/server:2019-latest
   fi
   echo -e "${GREEN} Container is being installed ${NC}"
-    docker run -p "80:80" -v ${PWD}/app:/app mattrayner/lamp:latest-2004-php8
+  sudo docker run -e 'ACCEPT_EULA=Y' -e "MSSQL_SA_PASSWORD=$password" \
+  --name "$containerName" -p "$hostport":1433 \
+  -v "$hostname"data:/var/opt/mssql \
+  -d mcr.microsoft.com/mssql/server:2019-latest  
   echo -e "${GREEN} Machine is installed and running ${NC}"
 else
   echo -e "${RED} Abort Success ${NC}"
