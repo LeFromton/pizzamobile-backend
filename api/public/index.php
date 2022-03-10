@@ -25,7 +25,6 @@ switch ($_SERVER['REQUEST_METHOD']) {
           }
           break;
         case 'kitchen':
-          // Todo : samee as on top
           switch($_REQUEST['action']){
             case 'finish':
               foreach($rqData['ctRoot'] as $order){
