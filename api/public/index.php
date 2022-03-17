@@ -7,12 +7,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
   case 'POST':
     $rqData = json_decode(file_get_contents('php://input'), true);
     if(!empty($rqData)){
+      
       switch($_REQUEST['location']){
         case 'checkin':
           switch($_REQUEST['action']){
             case 'new':
               foreach($rqData['ctRoot'] as $order){
-                writeOrder($order, '../db/new-orders.csv');
+                writeOrder($order, 'Orders');
               }
               $data = getCurrentOrders();
               break;
@@ -67,10 +68,16 @@ if(!empty($data)){
 }
 
 function removeOrder(array $order, string $path){
-  
+  $db = mysqli_connect("localhost:4439", "SA", "EXPRESS12345678", "PizzamobileDB");
+  $query = "DELETE FROM ? WHERE Id = '?' AND Status ='?';";
+  $stmt = mysqli_prepare($db, $query);
+  mysqli_stmt_bind_param($stmt, 'ss', $table, $order['name'], $order['phone'], $order['pizzas'], $order['status']);
+  mysqli_stmt_execute($stmt);
+  mysqli_stmt_close($stmt);
+  mysqli_close($db);
 }
 
-function writeOrder(array $order, $table){
+function writeOrder(array $order, string $table){
   $db = mysqli_connect("localhost:4439", "SA", "EXPRESS12345678", "PizzamobileDB");
   $query = "INSERT INTO ? (Name, Phone, Pizzas, Status) VALUES (?, ?, ?, ?);";
   $stmt = mysqli_prepare($db, $query);
