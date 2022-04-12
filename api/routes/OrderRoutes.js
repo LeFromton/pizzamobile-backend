@@ -1,11 +1,12 @@
 const express = require('express')
 const router = express.Router()
+const Auth = require('../modules/Auth')
 
 
 // Import mongoose schemas/models
 const Order = require('../models/Orders')
 
-// middleware that is specific to this router
+// Middleware that is specific to this router
 router.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
@@ -35,14 +36,14 @@ router.route('/api/orders/:orderId')
   })
 
   // Update specific order(s)
-  .put((req, res) => {
+  .put(Auth.verifyToken, (req, res) => {
     try {
       let filter = { _id: req.params.orderId }
       let update = {
-        name: req.body.name,
-        phone: req.body.phone,
-        status: req.body.status,
-        pizzas: req.body.pizzas
+        name: req.body.order.name,
+        phone: req.body.order.phone,
+        status: req.body.order.status,
+        pizzas: req.body.order.pizzas
       }
       Order.findOneAndUpdate(filter, update, { new: true })
         .lean().exec((errors, order) => {
@@ -59,7 +60,7 @@ router.route('/api/orders/:orderId')
   })
 
   // Remove specific order(s)
-  .delete((req, res) => {
+  .delete(Auth.verifyToken, (req, res) => {
     try {
       let filter = { _id: req.params.orderId }
       Order.findOneAndDelete(filter)
@@ -75,7 +76,7 @@ router.route('/api/orders/:orderId')
 
 router.route('/api/orders')
   // Return all orders
-  .get((req, res) => {
+  .get(Auth.verifyToken, (req, res) => {
     try {
       Order.find().lean().exec((errors, orders) => {
         if (orders.length == 0) {
@@ -90,13 +91,13 @@ router.route('/api/orders')
     }
   })
   // New Orders
-  .post((req, res) => {
+  .post(Auth.verifyToken, (req, res) => {
     try {
       let order = {
-        name: req.body.name,
-        phone: req.body.phone,
-        status: req.body.status,
-        pizzas: req.body.pizzas
+        name: req.body.order.name,
+        phone: req.body.order.phone,
+        status: req.body.order.status,
+        pizzas: req.body.order.pizzas
       }
       Order.create(order)
       res.sendStatus(201)
@@ -108,7 +109,7 @@ router.route('/api/orders')
   
 // Get filtered orders (for the views)
 router.route('/api/orders/filters/:filter')
-  .get((req, res) => {
+  .get(Auth.verifyToken, (req, res) => {
     try {
       Order.find({ status: req.params.filter}).lean().exec(function (error, orders) {
         if (order == null) {

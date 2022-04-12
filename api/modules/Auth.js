@@ -62,7 +62,7 @@ exports.verifyToken = function (req, res, next) {
     console.log(decode)
     User.findOne({ _id: decode.id }).exec((error, user) => {
       if(error){ res.sendStatus(404) }
-      if(user.email !== req.body.user.email){ res.sendStatus(401) }
+      if(user.email !== req.body.user.email) { res.sendStatus(401) }
       req.user = user
       next()
     })
