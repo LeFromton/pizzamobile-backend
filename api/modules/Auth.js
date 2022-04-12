@@ -55,18 +55,20 @@ exports.login = (req, res, next) => {
 
 // To verify JWT
 exports.verifyToken = function (req, res, next) {
-  if(!req.body.user.jwt){ res.sendStatus(400) }
-  
-  jwt.verify(req.body.user.jwt, process.env.API_SECRET, (error, decode) => {
-    if(error){ res.sendStatus(500) }
-    console.log(decode)
-    User.findOne({ _id: decode.id }).exec((error, user) => {
-      if(error){ res.sendStatus(404) }
-      if(user.email !== req.body.user.email) { res.sendStatus(401) }
-      req.user = user
-      next()
+  if(req.body.constructor === Object && Object.keys(req.body).length === 0) {
+    res.sendStatus(400)
+  } else {
+    jwt.verify(req.body.user.jwt, process.env.API_SECRET, (error, decode) => {
+      if(error){ res.sendStatus(500) }
+      console.log(decode)
+      User.findOne({ _id: decode.id }).exec((error, user) => {
+        if(error){ res.sendStatus(404) }
+        if(user.email !== req.body.user.email) { res.sendStatus(401) }
+        req.user = user
+        next()
+      })
     })
-  })
+  }
 }
 
 // To Compare passwords
