@@ -17,6 +17,35 @@ router.use((req, res, next) => {
   next()
 })
 
+router.route('/api/orders')
+  // Return all orders
+  .get(Auth.verifyToken, (req, res) => {
+    try {
+      Order.find().lean().exec((errors, orders) => {
+        if (orders.length == 0) {
+          res.sendStatus(400)
+        } else {
+          res.send(JSON.stringify(orders))
+        }
+      })
+    } catch (error) {
+      res.sendStatus(400)
+      throw error
+    }
+  })
+  // New Orders
+  .post(Auth.verifyToken, (req, res) => {
+    try {
+      req.body.order.key = Math.random().toString(16).substr(2, 8)
+      Order.create(req.body.order)
+      res.sendStatus(201)
+    } catch (error) {
+      res.sendStatus(400)
+      throw error
+    }
+  })
+
+
 router.route('/api/orders/:orderId')
   // Return specific order
   .get((req, res) => {
@@ -38,14 +67,7 @@ router.route('/api/orders/:orderId')
   // Update specific order(s)
   .put(Auth.verifyToken, (req, res) => {
     try {
-      let filter = { _id: req.params.orderId }
-      let update = {
-        name: req.body.order.name,
-        phone: req.body.order.phone,
-        status: req.body.order.status,
-        pizzas: req.body.order.pizzas
-      }
-      Order.findOneAndUpdate(filter, update, { new: true })
+      Order.findOneAndUpdate({ _id: req.params.orderId }, req.body.order, { new: true })
         .lean().exec((errors, order) => {
           if (order == null) {
             res.sendStatus(400)
@@ -72,42 +94,21 @@ router.route('/api/orders/:orderId')
       throw error
     }
   })
-
-
-router.route('/api/orders')
-  // Return all orders
-  .get(Auth.verifyToken, (req, res) => {
+  
+router.route('/api/orders/:orderId/:orderKey')
+  .get((req, res) => {
     try {
-      Order.find().lean().exec((errors, orders) => {
-        if (orders.length == 0) {
-          res.sendStatus(400)
-        } else {
-          res.send(JSON.stringify(orders))
-        }
+      Order.findById({ _id: req.params.orderId }).lean().exec((error, order) => {
+        if(error){ res.sendStatus(500); throw error }
+        if(order.key == req.params.orderKey){ res.send(order) } else { res.send(401) }
       })
     } catch (error) {
-      res.sendStatus(400)
-      throw error
-    }
-  })
-  // New Orders
-  .post(Auth.verifyToken, (req, res) => {
-    try {
-      let order = {
-        name: req.body.order.name,
-        phone: req.body.order.phone,
-        status: req.body.order.status,
-        pizzas: req.body.order.pizzas
-      }
-      Order.create(order)
-      res.sendStatus(201)
-    } catch (error) {
-      res.sendStatus(400)
       throw error
     }
   })
   
-// Get filtered orders (for the views)
+  
+  // Get filtered orders (for the views)
 router.route('/api/orders/filters/:filter')
   .get(Auth.verifyToken, (req, res) => {
     try {
