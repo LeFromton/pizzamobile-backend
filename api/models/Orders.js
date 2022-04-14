@@ -5,6 +5,7 @@ const orderSchema = new Schema({
   name: String,
   phone: String,
   status: String,
+  key: String,
   pizzas: [{ pizzaName: String, amount: Number}]
 })
 
