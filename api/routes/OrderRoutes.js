@@ -1,6 +1,5 @@
 const express = require('express')
 const router = express.Router()
-const Auth = require('../modules/Auth')
 const SMS = require('../modules/Sms')
 
 // Import mongoose schemas/models
@@ -19,7 +18,7 @@ router.use((req, res, next) => {
 
 router.route('/api/orders')
   // Return all orders
-  .get(Auth.verifyToken, (req, res) => {
+  .get((req, res) => {
     try {
       Order.find().lean().exec((errors, orders) => {
         if (orders.length == 0) {
@@ -34,7 +33,7 @@ router.route('/api/orders')
     }
   })
   // New Orders
-  .post(Auth.verifyToken, (req, res) => {
+  .post((req, res) => {
     try {
       req.body.order.key = Math.random().toString(16).substr(2, 8)
       Order.create(req.body.order)
@@ -65,7 +64,7 @@ router.route('/api/orders/:orderId')
   })
 
   // Update specific order(s)
-  .put(Auth.verifyToken, (req, res) => {
+  .put((req, res) => {
     try {
       Order.findOneAndUpdate({ _id: req.params.orderId }, req.body.order, { new: true })
         .lean().exec((errors, order) => {
@@ -83,7 +82,7 @@ router.route('/api/orders/:orderId')
   })
 
   // Remove specific order(s)
-  .delete(Auth.verifyToken, (req, res) => {
+  .delete((req, res) => {
     try {
       let filter = { _id: req.params.orderId }
       Order.findOneAndDelete(filter)
@@ -111,7 +110,7 @@ router.route('/api/orders/:orderId/:orderKey')
   
   // Get filtered orders (for the views)
 router.route('/api/orders/filters/:filter')
-  .get(Auth.verifyToken, (req, res) => {
+  .get((req, res) => {
     try {
       Order.find({ status: req.params.filter}).lean().exec(function (error, orders) {
         if (order == null) {

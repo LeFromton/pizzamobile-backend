@@ -5,10 +5,8 @@ const mongoose = require('mongoose')
 // HTTPD Addons
 const bodyParser = require("body-parser")
 const cookieParser = require('cookie-parser')
-const jwt = require('jsonwebtoken')
 
 // Import routes
-const UserRoutes = require('./routes/UserRoutes')
 const OrderRoutes = require('./routes/OrderRoutes')
 
 // Try DB Connection
@@ -30,7 +28,6 @@ const app = express()
 
   // Add routes
   app.use(OrderRoutes)
-  app.use(UserRoutes)
 
   // Specify API port
   app.listen(process.env.API_PORT)
