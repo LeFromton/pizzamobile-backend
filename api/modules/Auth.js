@@ -10,7 +10,7 @@ dotenv.config()
 // To add a new user
 exports.register = (req, res, next) => {
   var user = {
-    fullName: req.body.user.fullName,
+    fullName: req.body.user.fullname,
     email: req.body.user.email,
     role: req.body.user.role,
     password: bcrypt.hashSync(req.body.user.password, 8)
@@ -30,26 +30,27 @@ exports.register = (req, res, next) => {
 // To authenticate a user
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.user.email }).exec((error, user) => {
-    if(error){ res.sendStatus(500) }
-    if(!user){ res.sendStatus(404) }
-    if(!isPwdValid(req, user)){ 401 }
-
-    var token = jwt.sign({
-      id: user.id
-    }, process.env.API_SECRET, {
-      expiresIn: 86400
-    })
-
-    res.send({
-      user: {
-        _id: user._id,
-        fullName: user.fullName,
-        role: user.role,
-        phone: user.phone,
-        email: user.email,
-        jwt: token
-      }})
-      next()
+    if(!user || error ){ res.sendStatus(404) } else {
+      if(!req.body.user.password){ res.sendStatus(400) }
+      if(!isPwdValid(req, user)){ 401 }
+  
+      var token = jwt.sign({
+        id: user.id
+      }, process.env.API_SECRET, {
+        expiresIn: 86400
+      })
+  
+      res.send({
+        user: {
+          _id: user._id,
+          fullName: user.fullName,
+          role: user.role,
+          phone: user.phone,
+          email: user.email,
+          jwt: token
+        }})
+        next()
+    }
   })
 }
 
@@ -59,14 +60,14 @@ exports.verifyToken = function (req, res, next) {
     res.sendStatus(400)
   } else {
     jwt.verify(req.body.user.jwt, process.env.API_SECRET, (error, decode) => {
-      if(error){ res.sendStatus(500) }
-      console.log(decode)
-      User.findOne({ _id: decode.id }).exec((error, user) => {
-        if(error){ res.sendStatus(404) }
-        if(user.email !== req.body.user.email) { res.sendStatus(401) }
-        req.user = user
-        next()
-      })
+      if(error){ res.sendStatus(500) } else {
+        User.findOne({ _id: decode.id }).exec((error, user) => {
+          if(error){ res.sendStatus(404) }
+          if(user.email !== req.body.user.email) { res.sendStatus(401) }
+          req.user = user
+          next()
+        })
+      }
     })
   }
 }
