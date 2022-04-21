@@ -5,7 +5,7 @@ const Auth = require('../modules/Auth')
 
 // middleware that is specific to this router
 router.use((req, res, next) => {
-  res.setHeader('Access-Control-Allow-Origin', '*')
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
   res.setHeader('Content-type', 'application/json')
   res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type')

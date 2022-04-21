@@ -2,7 +2,6 @@ const express = require('express')
 const router = express.Router()
 const Auth = require('../modules/Auth')
 
-
 // Import mongoose schemas/models
 const Order = require('../models/Orders')
 
