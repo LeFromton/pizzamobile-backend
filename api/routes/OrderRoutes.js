@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const Auth = require('../modules/Auth')
+const SMS = require('../modules/Sms')
 
 // Import mongoose schemas/models
 const Order = require('../models/Orders')
@@ -71,6 +72,7 @@ router.route('/api/orders/:orderId')
           if (order == null) {
             res.sendStatus(400)
           } else {
+            if(order.status == "cooking"){ SMS.sendSMS(order) }
             res.sendStatus(202)
           }
       })
