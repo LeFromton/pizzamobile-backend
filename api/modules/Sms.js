@@ -15,7 +15,7 @@ exports.sendSMS = (order) => {
     },
     body: { 
       phone: order.phone, 
-      message: order 
+      message: "Bonjour, votre commande est presque prête, veuillez vous diriger vers le point de retrait. Merci" 
     },
     json: true
   }
