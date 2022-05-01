@@ -44,6 +44,21 @@ router.route('/api/orders')
       throw error
     }
   })
+  // Because with axios I cannot force GET to carry DATA
+  .put(Auth.verifyToken, (reeq, res) => {
+    try {
+      Order.find().lean().exec((errors, orders) => {
+        if (orders.length == 0) {
+          res.sendStatus(400)
+        } else {
+          res.send(JSON.stringify(orders))
+        }
+      })
+    } catch (error) {
+      res.sendStatus(400)
+      throw error
+    }
+  })
 
 
 router.route('/api/orders/:orderId')

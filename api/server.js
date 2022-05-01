@@ -5,7 +5,6 @@ const mongoose = require('mongoose')
 // HTTPD Addons
 const bodyParser = require("body-parser")
 const cookieParser = require('cookie-parser')
-const jwt = require('jsonwebtoken')
 
 // Import routes
 const UserRoutes = require('./routes/UserRoutes')
